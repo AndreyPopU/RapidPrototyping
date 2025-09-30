@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+
+    public List<Block> lastBlocks = new List<Block>();
 
     public int towerIndex;
     public GameObject blockPrefab;
@@ -37,6 +40,6 @@ public class GameManager : MonoBehaviour
         currentBlock = Instantiate(blockPrefab, transform.position, Quaternion.identity);
         currentBlock.transform.SetParent(transform);
         currentBlock.GetComponent<Block>().index = towerIndex;
-        clawPosition.position = Vector3.up * towerIndex;
+        clawPosition.position = Vector3.up * 2.5f * towerIndex;
     }
 }
