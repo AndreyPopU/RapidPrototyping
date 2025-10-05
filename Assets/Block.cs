@@ -7,8 +7,16 @@ public class Block : MonoBehaviour
     public int index;
     public ParticleSystem perfectPlacement;
     public ParticleSystem missedPlacement;
+    public Sprite[] colors;
 
     private Rigidbody2D rb;
+
+    private void Start()
+    {
+        if (placed) return;
+
+        GetComponentInChildren<SpriteRenderer>().sprite = colors[GameManager.instance.color];
+    }
 
     public void DropBlock()
     {
@@ -41,19 +49,25 @@ public class Block : MonoBehaviour
 
         if (collision.tag != "Block")
         {
-            print("Game Over");
             CameraManager.instance.Shake(.1f, .1f);
+            LaunchBlock(1);
+            GameManager.instance.lastBlocks.Remove(this);
+            GameManager.instance.LoseLife();
+            GameManager.instance.SpawnNewBlock(0);
+            Destroy(this);
             return;
         }
 
         if (collision.TryGetComponent(out Block block))
         {
             float surfaceDifference = Mathf.Abs(transform.position.x - block.transform.position.x);
+            transform.SetParent(GameManager.instance.swingParent);
 
             if (surfaceDifference < .25f) // Perfect placement
             {
                 // Play effect and snap
                 transform.position = new Vector3(block.transform.position.x, transform.position.y, 0);
+                GetComponentInChildren<SpriteRenderer>().sprite = colors[4]; // 4 is golden color
                 perfectPlacement.Play();
             }
 
@@ -88,6 +102,7 @@ public class Block : MonoBehaviour
                 GameManager.instance.towerIndex -= blocksKnockedOver; // +1 Because of the block that just fell and
                 Debug.Log($"Tower index is {GameManager.instance.towerIndex}");
 
+                GameManager.instance.LoseLife();
                 CameraManager.instance.Shake(.1f, .1f);
                 GameManager.instance.SpawnNewBlock(0);
                 return;
@@ -98,6 +113,7 @@ public class Block : MonoBehaviour
                 CameraManager.instance.Shake(.1f, .1f);
                 LaunchBlock(transform.position.x - block.transform.position.x);
                 GameManager.instance.lastBlocks.Remove(this);
+                GameManager.instance.LoseLife();
                 GameManager.instance.SpawnNewBlock(0);
                 Destroy(this);
                 return;
