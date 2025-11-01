@@ -23,6 +23,7 @@ public class Block : MonoBehaviour
         dropped = true;
         transform.SetParent(null);
         rb = gameObject.AddComponent<Rigidbody2D>();
+        GameManager.instance.canDrop = false;
     }
 
     public void LaunchBlock(float displacementDifference)
@@ -69,6 +70,8 @@ public class Block : MonoBehaviour
                 transform.position = new Vector3(block.transform.position.x, transform.position.y, 0);
                 GetComponentInChildren<SpriteRenderer>().sprite = colors[4]; // 4 is golden color
                 perfectPlacement.Play();
+                GameManager.instance.AddScore(200);
+                transform.rotation = Quaternion.identity;
             }
 
             if (block.index != index - 1) // If block you've collided with isn't the previous block - knock all blocks above it
@@ -120,6 +123,8 @@ public class Block : MonoBehaviour
             }
         }
 
+        transform.rotation = Quaternion.identity;
+        GameManager.instance.AddScore(100);
         GameManager.instance.lastBlocks.Add(this);
         GameManager.instance.SpawnNewBlock(1);
     }
