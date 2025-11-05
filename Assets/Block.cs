@@ -67,7 +67,7 @@ public class Block : MonoBehaviour
             if (surfaceDifference < .25f) // Perfect placement
             {
                 // Play effect and snap
-                transform.position = new Vector3(block.transform.position.x, transform.position.y, 0);
+                transform.position = new Vector3(block.transform.position.x, GameManager.instance.towerIndex, 0);
                 GetComponentInChildren<SpriteRenderer>().sprite = colors[4]; // 4 is golden color
                 perfectPlacement.Play();
                 GameManager.instance.AddScore(200);
@@ -124,6 +124,7 @@ public class Block : MonoBehaviour
         }
 
         transform.rotation = Quaternion.identity;
+        transform.position = new Vector3(transform.position.x, 2.68f * GameManager.instance.towerIndex - 2.68f, 0);
         GameManager.instance.AddScore(100);
         GameManager.instance.lastBlocks.Add(this);
         GameManager.instance.SpawnNewBlock(1);

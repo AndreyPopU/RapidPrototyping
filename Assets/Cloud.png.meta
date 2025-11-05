@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 707c1f629526f1d4ea80ca438e30d83d
+guid: a8ec834a71ae8b04e8969bddc51a5df3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3386545547340684358
-    second: BlockYellow_0
+      213: 3349391187094723686
+    second: Cloud_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: BlockYellow_0
+      name: Cloud_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1080
-        height: 1080
+        width: 406
+        height: 229
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ab3e31374c29001d0800000000000000
-      internalID: -3386545547340684358
+      spriteID: 66cda90f98d6b7e20800000000000000
+      internalID: 3349391187094723686
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      BlockYellow_0: -3386545547340684358
+      Cloud_0: 3349391187094723686
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

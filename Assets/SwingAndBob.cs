@@ -50,6 +50,8 @@ public class SwingAndBob : MonoBehaviour
     {
         YieldInstruction waitForFixedTime = new WaitForFixedUpdate();
 
+        currentPos = new Vector3(level.x, currentPos.y, currentPos.z);
+
         while (Mathf.Abs(currentPos.y - level.y) > 0.05f)
         {
             currentPos = Vector3.Lerp(currentPos, level, .25f);

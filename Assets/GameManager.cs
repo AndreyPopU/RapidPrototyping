@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,9 +11,11 @@ public class GameManager : MonoBehaviour
 
     public List<Block> lastBlocks = new List<Block>();
 
+    public int Xoffset = 38;
     public bool gameStarted;
     public bool canDrop;
     public int towerIndex;
+    public int buildings;
     public int lifes;
     public int score;
     public int color;
@@ -20,13 +24,16 @@ public class GameManager : MonoBehaviour
     public Transform swingParent;
     public Transform clawPosition;
     public Transform cameraFocus;
+    public GameObject groundFloorPrefab;
 
     [Header("UI")]
     public GameObject mainMenu;
     public GameObject retryMenu;
+    public GameObject winMenu;
     public GameObject creditsMenu;
     public TextMeshProUGUI lifesText;
     public TextMeshProUGUI scoreText;
+    public CanvasGroup fadePanel;
 
     // only needed if using Lerp
     public float minValue = -3;
@@ -57,10 +64,11 @@ public class GameManager : MonoBehaviour
 
     public void SpawnNewBlock(int towerIncrease)
     {
-        if (towerIndex >= 20)
+        if (towerIndex >= 15)
         {
             print("Game won!");
             clawPosition.GetComponent<SwingAndBob>().GetOut(Vector3.up * 5 * towerIndex);
+            winMenu.SetActive(true);
 
             return;
         }
@@ -69,16 +77,74 @@ public class GameManager : MonoBehaviour
         towerIndex += towerIncrease;
         currentBlock = Instantiate(blockPrefab, clawPosition.position, clawPosition.rotation, clawPosition);
         currentBlock.GetComponent<Block>().index = towerIndex;
-        clawPosition.GetComponent<SwingAndBob>().RaiseTo(Vector3.up * 2.75f * towerIndex);
-        cameraFocus.position = Vector3.up * 2.75f * towerIndex + Vector3.up;
-
-        // Every 5th block - change color
-        if (towerIndex % 5 == 0) color = Random.Range(0, 4);
+        clawPosition.GetComponent<SwingAndBob>().RaiseTo(new Vector3(Xoffset * buildings, 2.75f * towerIndex, 0));
+        cameraFocus.position = new Vector3(Xoffset * buildings, 2.75f * towerIndex + 1, 0);
 
         canDrop = true;
+
+        if (towerIndex % 5 == 0) color = Random.Range(0, 4);
     }
 
-    public void Retry() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    public void NextBlock() => StartCoroutine(NextBlockCo());
+
+    private IEnumerator NextBlockCo()
+    {
+        YieldInstruction waitForFixedUpdate = new WaitForFixedUpdate();
+
+        // Fade out
+        while(fadePanel.alpha < 1)
+        {
+            fadePanel.alpha += .1f;
+
+            yield return waitForFixedUpdate;
+        }
+
+        // Reset camera and claw and tower index and such and offset them to the right a bit
+        if (towerIndex >= 15)
+        {
+            print("tower index has reached the maximum");
+            buildings++; // If building is complete
+            Instantiate(groundFloorPrefab, new Vector3(Xoffset * buildings, -3, 0), Quaternion.identity);
+        }
+        else
+        {
+            for (int i = 0; i < lastBlocks.Count; i++) // Remove entire building
+                Destroy(lastBlocks[i].gameObject);
+        }
+
+        towerIndex = 0;
+        score = 0;
+        lifes = 3;
+        lifesText.text = lifes.ToString();
+        scoreText.text = score.ToString();
+
+        gameStarted = true;
+        canDrop = true;
+
+        clawPosition.GetComponent<SwingAndBob>().StopAllCoroutines();
+        Vector3 offset = new Vector3(Xoffset * buildings, 3f, 0);
+        clawPosition.GetComponent<SwingAndBob>().currentPos = offset;
+        clawPosition.transform.position = offset;
+        CameraManager.instance.target.position = offset;
+        cameraFocus.position = Vector3.right * Xoffset * buildings + Vector3.up * 3 * towerIndex + Vector3.up;
+        color = 0;
+        SpawnNewBlock(1);
+        lastBlocks.Clear();
+
+        for (int i = 0; i < swingParent.childCount; i++)
+            Destroy(swingParent.GetChild(i).GetComponent<Block>());
+        swingParent.transform.DetachChildren();
+
+        yield return new WaitForSeconds(1);
+
+        // Fade in
+        while (fadePanel.alpha > 0)
+        {
+            fadePanel.alpha -= .1f;
+
+            yield return waitForFixedUpdate;
+        }
+    }
 
     public void Quit() => Application.Quit();
 
@@ -93,7 +159,20 @@ public class GameManager : MonoBehaviour
         lifes--;
         lifesText.text = lifes.ToString();
 
-        if (lifes <= 0) retryMenu.SetActive(true);
+        if (lifes <= 0) StartCoroutine(TraceBuilding());
+    }
+
+    private IEnumerator TraceBuilding()
+    {
+        YieldInstruction waitForFixedUpdate = new WaitForFixedUpdate();
+
+        while (cameraFocus.position.y > 3)
+        {
+            cameraFocus.transform.Translate(-Vector3.up * .2f);
+            yield return waitForFixedUpdate;
+        }
+
+        retryMenu.SetActive(true);
     }
 
     public void AddScore(int amount)
