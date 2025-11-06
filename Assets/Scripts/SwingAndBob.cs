@@ -32,6 +32,12 @@ public class SwingAndBob : MonoBehaviour
         float targetSwingAmplitude = baseSwingAmplitude * GameManager.instance.towerIndex / 10;
         float targetBobAmplitude = baseBobAmplitude * GameManager.instance.towerIndex / 10;
 
+        if (GameManager.instance.towerIndex > 10)
+        {
+            targetSwingAmplitude = baseSwingAmplitude;
+            targetBobAmplitude = baseBobAmplitude;
+        }
+        
         // Smoothly interpolate to avoid snapping
         currentSwingAmplitude = Mathf.Lerp(currentSwingAmplitude, targetSwingAmplitude, Time.deltaTime * 5f);
         currentBobAmplitude = Mathf.Lerp(currentBobAmplitude, targetBobAmplitude, Time.deltaTime * 5f);

@@ -111,7 +111,7 @@ public class Block : MonoBehaviour
                 return;
             }
 
-            if (surfaceDifference > 2f) // Block falls off
+            if (surfaceDifference > 1.75f) // Block falls off
             {
                 CameraManager.instance.Shake(.1f, .1f);
                 LaunchBlock(transform.position.x - block.transform.position.x);

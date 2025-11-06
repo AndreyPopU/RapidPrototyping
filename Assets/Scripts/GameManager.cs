@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -50,6 +48,8 @@ public class GameManager : MonoBehaviour
         if (!gameStarted || lifes <= 0) return;
 
         float swingForce = startPosition + Mathf.Sin(Time.time * speed) * .1f * towerIndex;
+
+        if (towerIndex >= 15) swingForce = startPosition + Mathf.Sin(Time.time * speed) * 2;
         swingParent.position = new Vector3(swingForce, 0, 0);
 
         if (Input.GetKeyDown(KeyCode.Space) && currentBlock != null && canDrop)
@@ -64,7 +64,9 @@ public class GameManager : MonoBehaviour
 
     public void SpawnNewBlock(int towerIncrease)
     {
-        if (towerIndex >= 15)
+        towerIndex += towerIncrease;
+
+        if (towerIndex >= 70)
         {
             print("Game won!");
             clawPosition.GetComponent<SwingAndBob>().GetOut(Vector3.up * 5 * towerIndex);
@@ -74,11 +76,10 @@ public class GameManager : MonoBehaviour
         }
 
         if (lifes <= 0) return;
-        towerIndex += towerIncrease;
         currentBlock = Instantiate(blockPrefab, clawPosition.position, clawPosition.rotation, clawPosition);
         currentBlock.GetComponent<Block>().index = towerIndex;
-        clawPosition.GetComponent<SwingAndBob>().RaiseTo(new Vector3(Xoffset * buildings, 2.75f * towerIndex, 0));
-        cameraFocus.position = new Vector3(Xoffset * buildings, 2.75f * towerIndex + 1, 0);
+        clawPosition.GetComponent<SwingAndBob>().RaiseTo(new Vector3(Xoffset * buildings, 2.7f * towerIndex, 0));
+        cameraFocus.position = new Vector3(Xoffset * buildings, 2.7f * towerIndex + 1, 0);
 
         canDrop = true;
 
@@ -100,7 +101,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Reset camera and claw and tower index and such and offset them to the right a bit
-        if (towerIndex >= 15)
+        if (towerIndex >= 70)
         {
             print("tower index has reached the maximum");
             buildings++; // If building is complete
